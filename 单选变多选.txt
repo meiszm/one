@@ -1,0 +1,84 @@
+
+    
+            //已知数据
+            var data = eval({$list});
+            //方法级渲染
+            table.render({
+                elem: '#LAY_table_user'
+                ,cols: [[
+                    {type:'checkbox', fixed: 'left'}
+                    ,{field:'product_type_id', title: 'ID', sort: true, fixed: true}
+                    ,{field:'product_type_name', title: '类型名称'}
+                    ,{field:'product_set_title', title: '所属分类', sort: true}
+                ]]
+                ,data:data      //已知数据
+                ,id: 'testReload'
+                ,page: true
+                ,limit:5
+                ,height: 300
+                ,done: function(res, curr, count) {
+                    /*上级传输过来的id*/
+                    var $_parent_type_id = parent.$('#product_type_id').val();
+                    if($_parent_type_id)
+                    {
+                        /*设置选中状态*/
+                        for(var i=0;i< res.data.length;i++){
+
+                            if(res.data[i].product_type_id == $_parent_type_id)
+                            {
+                                //这里才是真正的有效勾选
+                                res.data[i]["LAY_CHECKED"]='true';
+                                //找到对应数据改变勾选样式，呈现出选中效果
+                                var index= res.data[i]['LAY_TABLE_INDEX'];
+                                $('.layui-table-fixed-l tr[data-index=' + index + '] input[type="checkbox"]').prop('checked', true);
+                                $('.layui-table-fixed-l tr[data-index=' + index + '] input[type="checkbox"]').next().addClass('layui-form-checked');
+                            }
+
+                        }
+                    }
+                }
+
+            });
+
+
+            //监听表格复选框选择
+            table.on('checkbox(typeSelect)', function(obj){
+                var index =obj.data.LAY_TABLE_INDEX;
+                console.log(obj);
+                $_id = obj.data.product_type_id;
+                $_name=obj.data.product_type_name;
+               /* 多选变单选 */
+                cancelSelected(data,index);
+            });
+
+
+			
+			
+			
+			/**
+ * 数据表格 已知数据 多选变单选
+ * @param data
+ * @param selectIndex
+ */
+function cancelSelected(data,selectIndex) {
+    for(var i=0;i< data.length;i++){
+        for (var j = 0; j < data.length; j++) {
+            //数据id和要勾选的id相同时checkbox选中
+
+            //找到对应数据改变勾选样式，呈现出选中效果
+            var index= data[i]['LAY_TABLE_INDEX'];
+            if(selectIndex != index )
+            {
+                //这里才是真正的有效勾选
+                data[i]["LAY_CHECKED"]='false';
+                //找到对应数据改变勾选样式，呈现出选中效果
+                $('.layui-table-fixed-l tr[data-index=' + index + '] input[type="checkbox"]').prop('checked', false);
+                $('.layui-table-fixed-l tr[data-index=' + index + '] input[type="checkbox"]').next().removeClass('layui-form-checked');
+            }
+
+            $(' .layui-table-header th[data-field="0"] input[type="checkbox"]').prop('checked', false);
+            $('.layui-table-header th[data-field="0"] input[type="checkbox"]').next().removeClass('layui-form-checked');
+
+        }
+    }
+}
